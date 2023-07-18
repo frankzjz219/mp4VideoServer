@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<style>
+    .name{
+        width: 90%;
+        /*animation: 3s wordsLoop linear infinite normal;*/
+        overflow: visible;
+        table-layout: fixed;
+    }
+    #mp4table{
+        width: 30%;
+        table-layout: fixed;
+        float: right;
+        display: inline;
+    }
+    /*@keyframes wordsLoop {*/
+    /*        0% {*/
+    /*            transform: translateX(0px);*/
+    /*            -webkit-transform: translateX(0px);*/
+    /*        }*/
+    /*        100% {*/
+    /*            transform: translateX(-100%);*/
+    /*            -webkit-transform: translateX(-100%);*/
+    /*        }*/
+    /*    }*/
+</style>
+<html lang="en">
+<head>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <video src="/page/video" width=60% autoplay="autoplay" controls="controls" preload="auto" id="video"></video>
+    <table id = "mp4table">
+
+    </table>
+</body>
+</html>
+
+<script>
+    function loadMp4s()
+    {
+        var mp4Table = document.getElementById("mp4table")
+        while(mp4Table.childElementCount>0)
+        {
+            mp4Table.removeChild(mp4Table.childNodes[0]);
+        }
+        $.ajax({
+            type: "GET",
+            url: "page/files",
+            success: function (data) {
+                var dict = JSON.parse(data);
+                // console.log("dict:", dict['list']);
+                for (var i = 0; i<dict['list'].length; i++)
+                {
+                    rowElement = document.createElement("tr")
+                    dataElement = document.createElement("td")
+                    dataElement.innerHTML = dict['list'][i]
+                    dataElement.setAttribute("onclick", "setFile(this)")
+                    dataElement.className = "name"
+                    rowElement.appendChild(dataElement)
+                    mp4Table.appendChild(rowElement)
+                }
+            }
+        })
+        setTimeout(getCurMp4, 200);
+    }
+
+    function setFile(e)
+    {
+        mp4Table = document.getElementById("mp4table")
+        console.log(e.innerHTML)
+        for(var i = 0; i<mp4Table.childNodes.length; i++)
+        {
+            mp4Table.childNodes[i].bgColor = 'white'
+        }
+        e.bgColor = "cornflowerblue"
+        $.ajax({
+            type: "POST",
+            url: "page/setFile",
+            data: JSON.stringify({"mp4File":e.innerHTML}),
+            success: function (data) {
+                setTimeout(function (){window.open("/page");window.close();}, 500);
+            }
+        })
+    }
+
+    function getCurMp4()
+    {
+        $.ajax({
+            type: "GET",
+            url: "page/getCurMp4",
+            success: function (data) {
+                var dict = JSON.parse(data);
+                fileStr = dict['cur']
+                console.log(fileStr)
+                table = document.getElementById("mp4table")
+                for(var i = 1; i<table.childNodes.length; i++)
+                {
+                    // console.log()
+                    if(table.childNodes[i].childNodes[0].innerHTML === fileStr)
+                    {
+                        table.childNodes[i].childNodes[0].bgColor = "cornflowerblue"
+                    }
+                    else
+                    {
+                        table.childNodes[i].childNodes[0].bgColor = "white"
+                    }
+                }
+            }
+        })
+    }
+    setTimeout(loadMp4s, 1000);
+    setInterval(getCurMp4, 1000);
+    // function reloadMp4()
+    // {
+    //     var videoELe = document.getElementById("video");
+    //     if(videoELe.readyState === 0||videoELe.networkState === 3)
+    //     {
+    //         videoELe.load();
+    //         console.log("reloading");
+    //     }
+    // }
+    // setInterval(reloadMp4, 500);
+</script>
