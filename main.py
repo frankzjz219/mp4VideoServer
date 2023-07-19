@@ -12,7 +12,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-fileStr = "JWSmall.mp4"
+fileStr = "Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4"
 filePrev = fileStr
 
 @app.after_request
