@@ -1,27 +1,50 @@
 <!DOCTYPE html>
 <style>
-    .name{
-        width: 90%;
-        /*animation: 3s wordsLoop linear infinite normal;*/
+    .short{
+        width: 100%;
         overflow: visible;
         table-layout: fixed;
+        padding: 10px;
+        white-space: nowrap;
+        border-bottom: 2px solid rgb(49, 49, 49);
+    }
+    .name{
+        width: 100%;
+        overflow: visible;
+        table-layout: fixed;
+        padding: 10px;
+        white-space: nowrap;
+        animation: scrollText 10s linear infinite;
+        transition: all 1500ms ease-in-out;
+        /* border-top: 2px solid rgb(49, 49, 49); */
+        border-bottom: 2px solid rgb(49, 49, 49);
+    }
+    @keyframes scrollText {
+      0% {
+        transform: translateX(0);
+      }
+      20% {
+        transform: translateX(0%);
+      }
+      60% {
+        transform: translateX(-20%);
+      }
+      100%{
+        transform: translateX(-0%);
+      }
     }
     #mp4table{
-        width: 30%;
+        width: 35%;
         table-layout: fixed;
         float: right;
         display: inline;
+        height: 500px;
+        background-color:rgb(228, 228, 228);
+        overflow-y: scroll;
+        overflow-x: hidden;
+        position: fixed;
+        border-radius: 5%;
     }
-    /*@keyframes wordsLoop {*/
-    /*        0% {*/
-    /*            transform: translateX(0px);*/
-    /*            -webkit-transform: translateX(0px);*/
-    /*        }*/
-    /*        100% {*/
-    /*            transform: translateX(-100%);*/
-    /*            -webkit-transform: translateX(-100%);*/
-    /*        }*/
-    /*    }*/
 </style>
 <html lang="en">
 <head>
@@ -29,7 +52,8 @@
     <meta charset="UTF-8">
 </head>
 <body>
-    <video src="/page/video" width=60% autoplay="autoplay" controls="controls" preload="auto" id="video"></video>
+<h1 id = "h1">Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc</h1>
+    <video src="/page/video?movie=Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4" autoplay="autoplay" width=60% controls="controls" preload="none" id="video"></video>
     <table id = "mp4table">
 
     </table>
@@ -37,6 +61,10 @@
 </html>
 
 <script>
+    setInterval(function(){
+        var height = document.getElementById("video").offsetHeight;
+        document.getElementById("mp4table").style.height = height+"px";
+    }, 500);
     function loadMp4s()
     {
         var mp4Table = document.getElementById("mp4table")
@@ -56,69 +84,72 @@
                     dataElement = document.createElement("td")
                     dataElement.innerHTML = dict['list'][i]
                     dataElement.setAttribute("onclick", "setFile(this)")
-                    dataElement.className = "name"
+                    if(dict['list'][i].length<30)
+                    {
+                        dataElement.className = "short"
+                    }
+                    else
+                    {
+                        dataElement.className = "name"
+                    }
                     rowElement.appendChild(dataElement)
                     mp4Table.appendChild(rowElement)
                 }
             }
         })
-        setTimeout(getCurMp4, 200);
     }
 
     function setFile(e)
     {
         mp4Table = document.getElementById("mp4table")
         console.log(e.innerHTML)
-        for(var i = 0; i<mp4Table.childNodes.length; i++)
+        for(var i = 1; i<mp4Table.childNodes.length; i++)
         {
-            mp4Table.childNodes[i].bgColor = 'white'
+            mp4Table.childNodes[i].childNodes[0].style.fontWeight = "normal";
         }
-        e.bgColor = "cornflowerblue"
-        $.ajax({
-            type: "POST",
-            url: "page/setFile",
-            data: JSON.stringify({"mp4File":e.innerHTML}),
-            success: function (data) {
-                setTimeout(function (){window.open("/page");window.close();}, 500);
-            }
-        })
+        e.style.fontWeight = "bold";
+        document.getElementById("h1").innerHTML = e.innerHTML.slice(0, -4);
+        videoEle = document.getElementById("video");
+        videoEle.setAttribute("src", "/page/video?movie="+e.innerHTML);
+        videoEle.load();
+
+
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: "page/setFile",
+        //     data: JSON.stringify({"mp4File":e.innerHTML}),
+        //     success: function (data) {
+        //         setTimeout(function (){window.open("/page");window.close();}, 500);
+        //     }
+        // })
     }
 
-    function getCurMp4()
-    {
-        $.ajax({
-            type: "GET",
-            url: "page/getCurMp4",
-            success: function (data) {
-                var dict = JSON.parse(data);
-                fileStr = dict['cur']
-                console.log(fileStr)
-                table = document.getElementById("mp4table")
-                for(var i = 1; i<table.childNodes.length; i++)
-                {
-                    // console.log()
-                    if(table.childNodes[i].childNodes[0].innerHTML === fileStr)
-                    {
-                        table.childNodes[i].childNodes[0].bgColor = "cornflowerblue"
-                    }
-                    else
-                    {
-                        table.childNodes[i].childNodes[0].bgColor = "white"
-                    }
-                }
-            }
-        })
-    }
-    setTimeout(loadMp4s, 1000);
-    setInterval(getCurMp4, 1000);
-    // function reloadMp4()
+    // function getCurMp4()
     // {
-    //     var videoELe = document.getElementById("video");
-    //     if(videoELe.readyState === 0||videoELe.networkState === 3)
-    //     {
-    //         videoELe.load();
-    //         console.log("reloading");
-    //     }
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "page/getCurMp4",
+    //         success: function (data) {
+    //             var dict = JSON.parse(data);
+    //             fileStr = dict['cur']
+    //             console.log(fileStr)
+    //             table = document.getElementById("mp4table")
+    //             for(var i = 1; i<table.childNodes.length; i++)
+    //             {
+    //                 // console.log()
+    //                 if(table.childNodes[i].childNodes[0].innerHTML === fileStr)
+    //                 {
+    //                     table.childNodes[i].childNodes[0].style.fontWeight = "bold";
+    //                 }
+    //                 else
+    //                 {
+    //                     table.childNodes[i].childNodes[0].style.fontWeight = "normal";
+    //                 }
+    //             }
+    //         }
+    //     })
     // }
-    // setInterval(reloadMp4, 500);
+    setTimeout(loadMp4s, 1000);
+    // setInterval(getCurMp4, 1000);
 </script>

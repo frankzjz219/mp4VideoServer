@@ -12,8 +12,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-fileStr = "Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4"
-filePrev = fileStr
+# fileStr = "Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4"
+# filePrev = fileStr
 
 @app.after_request
 def disable_caching(response):
@@ -22,10 +22,10 @@ def disable_caching(response):
     response.headers['Pragma'] = 'no-cache'
     return response
 
-@app.route('/page/getCurMp4')
-def getCurMp4():
-    global fileStr
-    return json.dumps({'cur':fileStr})
+# @app.route('/page/getCurMp4')
+# def getCurMp4():
+#     global fileStr
+#     return json.dumps({'cur':fileStr})
 
 @app.route('/page/files', methods=['POST', 'GET'])
 def getSupportedFile():
@@ -36,16 +36,16 @@ def getSupportedFile():
     return json.dumps(mp4Dict)
 
 
-@app.route('/page/setFile', methods=['POST', 'GET'])
-def setMp4File():
-    global fileStr
-    print(request.get_data())
-    fileStr = json.loads(request.get_data())['mp4File']
-    return json.dumps("{}")
+# @app.route('/page/setFile', methods=['POST', 'GET'])
+# def setMp4File():
+#     global fileStr
+#     print(request.get_data())
+#     fileStr = json.loads(request.get_data())['mp4File']
+#     return json.dumps("{}")
 
 
-def get_chunk(byte1=None, byte2=None):
-    global fileStr
+def get_chunk(fileStr, byte1=None, byte2=None):
+    # global fileStr
     # full_path = "JWSmall.mp4"
     file_size = os.stat("D:/迅雷下载/mp4ToServer/"+fileStr).st_size
     start = 0
@@ -65,14 +65,18 @@ def get_chunk(byte1=None, byte2=None):
 
 @app.route('/page/video')
 def streamVideo():
-    global fileStr
-    global filePrev
+    # global fileStr
+    # global filePrev
     # if fileStr != filePrev:
     #     filePrev = fileStr
     #     print("stopping loading")
     #     return json.dumps("{}")
+
+    fileStr = request.args.get("movie")
+
     print("loading video: %s"%fileStr)
     range_header = request.headers.get('Range', None)
+
     byte1, byte2 = 0, None
     if range_header:
         match = re.search(r'(\d+)-(\d*)', range_header)
@@ -83,7 +87,7 @@ def streamVideo():
         if groups[1]:
             byte2 = int(groups[1])
 
-    chunk, start, length, file_size = get_chunk(byte1, byte2)
+    chunk, start, length, file_size = get_chunk(fileStr, byte1, byte2)
     resp = Response(chunk, 206, mimetype='video/mp4',
                     content_type='video/mp4', direct_passthrough=True)
     resp.headers.add('Content-Range', 'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
