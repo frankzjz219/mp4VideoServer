@@ -14,25 +14,25 @@
         table-layout: fixed;
         padding: 10px;
         white-space: nowrap;
-        animation: scrollText 10s linear infinite;
-        transition: all 1500ms ease-in-out;
+        /*animation: scrollText 10s linear infinite;*/
+        /*transition: all 1500ms ease-in-out;*/
         /* border-top: 2px solid rgb(49, 49, 49); */
         border-bottom: 2px solid rgb(49, 49, 49);
     }
-    @keyframes scrollText {
-      0% {
-        transform: translateX(0);
-      }
-      20% {
-        transform: translateX(0%);
-      }
-      60% {
-        transform: translateX(-20%);
-      }
-      100%{
-        transform: translateX(-0%);
-      }
-    }
+    /*@keyframes scrollText {*/
+    /*  0% {*/
+    /*    transform: translateX(0);*/
+    /*  }*/
+    /*  20% {*/
+    /*    transform: translateX(0%);*/
+    /*  }*/
+    /*  60% {*/
+    /*    transform: translateX(-20%);*/
+    /*  }*/
+    /*  100%{*/
+    /*    transform: translateX(-0%);*/
+    /*  }*/
+    /*}*/
     #mp4table{
         width: 35%;
         table-layout: fixed;
@@ -41,7 +41,7 @@
         height: 500px;
         background-color:rgb(228, 228, 228);
         overflow-y: scroll;
-        overflow-x: hidden;
+        overflow-x: scroll;
         position: fixed;
         border-radius: 5%;
     }
@@ -53,10 +53,11 @@
 </head>
 <body>
 <h1 id = "h1">Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc</h1>
-    <video src="/page/video?movie=Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4" autoplay="autoplay" width=60% controls="controls" preload="none" id="video"></video>
+    <video src="/page/video?movie=Love.Death.and.Robots.S01E02.Three.Robots.1080p.VINEnc.mp4" width=60% controls="controls" preload="none" id="video"></video>
     <table id = "mp4table">
 
     </table>
+    <div id ="output"></div>
 </body>
 </html>
 
@@ -113,43 +114,19 @@
         videoEle.setAttribute("src", "/page/video?movie="+e.innerHTML);
         videoEle.load();
 
-
-
-        // $.ajax({
-        //     type: "POST",
-        //     url: "page/setFile",
-        //     data: JSON.stringify({"mp4File":e.innerHTML}),
-        //     success: function (data) {
-        //         setTimeout(function (){window.open("/page");window.close();}, 500);
-        //     }
-        // })
     }
 
-    // function getCurMp4()
-    // {
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "page/getCurMp4",
-    //         success: function (data) {
-    //             var dict = JSON.parse(data);
-    //             fileStr = dict['cur']
-    //             console.log(fileStr)
-    //             table = document.getElementById("mp4table")
-    //             for(var i = 1; i<table.childNodes.length; i++)
-    //             {
-    //                 // console.log()
-    //                 if(table.childNodes[i].childNodes[0].innerHTML === fileStr)
-    //                 {
-    //                     table.childNodes[i].childNodes[0].style.fontWeight = "bold";
-    //                 }
-    //                 else
-    //                 {
-    //                     table.childNodes[i].childNodes[0].style.fontWeight = "normal";
-    //                 }
-    //             }
-    //         }
-    //     })
-    // }
+    function getVideoStatus()
+    {
+        videoEle = document.getElementById("video");
+        divOut = document.getElementById("output");
+        divOut.innerHTML = "";
+        divOut.innerHTML+="mediaError: "+videoEle.error.code+"ready:"+videoEle.readyState+"network"+videoEle.networkState;
+        console.log(videoEle.error);
+        console.log(videoEle.readyState);
+        console.log(videoEle.networkState);
+    }
     setTimeout(loadMp4s, 1000);
+    setInterval(getVideoStatus, 1000);
     // setInterval(getCurMp4, 1000);
 </script>
